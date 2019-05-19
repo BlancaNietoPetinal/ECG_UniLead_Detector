@@ -2,13 +2,9 @@
 
 #load the file
 ecg = np.loadtxt('ecg_2leads.txt',delimiter =' ') #ECG values
-samples = np.loadtxt('ecg_2leads_detec.txt',delimiter =' ') #detection points
-
- #Change from floats to integers
-samples = np.array(samples, dtype=np.int64)
 
 fs = 128 #frecuency sampling
-t = np.arange (0, len(ecg))/fs #create a time vector frin 0 to the length of the ECG
+t = np.arange (0, len(ecg))/fs #create a time vector from 0 to the length of the ECG
 
 #Plot
 plt.figure()
