@@ -1,0 +1,69 @@
+from scipy import signal
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+def exponential(a,x): 
+    '''Creates the exponential.
+    Takes as inputs:
+        - a: float, the base, a<1 will be of interest in this study
+        - x: array, will be de values to create the exponential
+    Returns:
+        - An array with the exponencial values'''
+    f = []
+    for i in range(len(x)): #iterate the values of x
+        f += [a**x[i]] #calculate a list with the exponential values
+    return np.array(f)
+
+def correction(list1,begin,window = 100):
+    '''Calculates the number of samples deflected. The function works looking for a maximum near to the begin point, 
+    takes it as the maximum. To considerate a sample maximum, the function checks two statement:
+        - If the value observed is less than the begin one, skip it.
+        - If the value observed is higher than the last one saved as maximum, it becomes in a new maximum.
+    Inputs:
+        - list1: array. The samples of the ECG.
+        - begin: integer. The x-point the function should start at (should be the maximum detected)
+        - window: integer. The number of samples the function checks. Default value is 100 (100 right and 100 left)
+    Output:
+        - Returns an int value, the number of samples the maximum is deflected'''
+    M = 0
+    M1 = 0
+    M2 = 0
+    for i in range(window):
+        if list1[begin-i]>list1[begin] and list1[begin-i]>list1[M1]: #Check left side
+            M1 = begin-i
+        if list1[begin+i]>list1[begin] and list1[begin-i]>list1[M2]: #Check right side
+            M2 = begin+i
+    if list1[M1]>list1[M2]:
+        M = M1
+    else:
+        M = M2
+    return (begin-M)
+
+def cut_points(vec1,vec2,sensibility = 0.0001):
+    '''Calculates the first cut point between two vectors.
+    Inputs:
+        - vec1/vec2: vectors.
+        - Sensibility: float. As two floats are not expected to be exactly the same.
+    Outputs:
+        - The first cut point.'''
+    cortes = []
+    for i in range(128*5):
+        if (vec1[i] - vec2[i])<sensibility: # we consider it as a cut point if the subtract of the values of the two vector are nearly the same
+            cortes += [i]
+    return cortes[0]
+
+def next_max(list1,begin_point):
+    '''Inputs:
+            - list1: array. ECG values.
+            - begin_point: int. Should be the cut points obtained.
+        Outputs:
+            - Returns the closest relative maximum'''
+    i = 0
+    m=i+begin_point
+    while list1[m+1]-list1[m]>0: #when the value at the left is higher than the right one, this statement will be negative, stopping the while loop
+        i+=1
+        m=i+begin_point
+    return m
+
+
