@@ -1,0 +1,47 @@
+#Looking for the new cut point between the exponential and the ECG
+
+plt.figure()
+plt.plot(t[:128*5],integ[:128*5])
+ 
+ex = exponential(0.5,t)
+pc=[] #cut points
+maxim=[] #maximums obtained
+
+#Getting the cut points and maximums
+for i in range (6):
+    cut = cut_points(ex,integ) #obtain the cut point
+    m= next_max(integ,cut) #search the next max starting on the cut point obtained
+    height = integ[m]*1.05 #adjust the height
+    ex = height*exponential(0.5,t[0:128*5]-t[cut]) #place the exponential
+    pc+=[cut] #add the cut point found
+    maxim+=[m] #add the maximum found
+
+
+#Plot
+
+for i in range (0,5):
+    height = integ[maxim[i]]*1.05
+    ex = height*exponential(0.5,t[0:128*5]-t[pc[i]])
+    plt.plot(t[maxim[i]:pc[i+1]],ex[maxim[i]:pc[i+1]])
+  
+
+plt.title("ECG filtered + moved exponentials")
+plt.xlabel('Time (s)')
+plt.ylabel('mV')
+
+#-------------------------------------------------CORRECTION------------------------------------------------------------------------
+
+deflected_points = correction(ecg1,maxim[0]) #calculates the number of samples deviated
+
+correct_max = []
+for i in range(6):
+    correct_max += [maxim[i]-deflected_points]
+
+#------------------------------------------------FINAL PLOT--------------------------------------------------------------------------
+
+plt.figure()
+plt.plot(t[:128*5],ecg[:128*5,0])
+plt.plot(t[correct_max[0:6]],ecg[correct_max[0:6],0],'ro')
+plt.title("ECG + Detection points")
+plt.xlabel('Time (s)')
+plt.ylabel('mV')
