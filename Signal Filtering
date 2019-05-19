@@ -1,0 +1,47 @@
+#-------------------------------------First Filter: Band-Pass filter----------------------------------------------------------------
+
+#Get the channels
+
+ecg1 = ecg[:,0]
+ecg2 = ecg[:,1]
+
+f1,f2 = 11,25 # Cutoff
+
+
+N = 128 # number of coefficients
+
+b = signal.firwin(N, [f1/(fs/2), f2/(fs/2)], pass_zero = False) # getting the coefficients
+ecg1_bp = signal.filtfilt(b,np.arange(1,2),ecg1) #apply filter
+
+#plot 5 seconds of the signal
+plt.figure()
+plt.plot(t[:128*5],ecg1_bp[:128*5]) 
+plt.title("ECG filtered with Band-Pass Filter")
+plt.xlabel('Time (s)')
+plt.ylabel('mV')
+plt.show()
+
+#-----------------------------------------Second Filter: Non Linear Filter ----------------------------------------------------------
+
+ecg1_bp_2 = ecg1_bp**2
+
+#plot
+plt.figure()
+plt.plot(t[0:128*5],ecg1_bp_2[0:128*5])
+plt.title("ECG filtered with Non-Linear Filtering")
+plt.xlabel('Time (s)')
+plt.ylabel('mV')
+plt.show()
+
+#-----------------------------------------------Third Filter: Integer Filter ---------------------------------------------------------
+
+integration_window = 11 #Number of points of the integration
+integ= np.convolve(ecg1_bp_2, np.ones(integration_window)) #convolution
+
+#plot
+plt.figure()
+plt.plot(integ[0:128*5])
+plt.title("ECG filtered with Integer Filtering")
+plt.xlabel('Time (s)')
+plt.ylabel('mV')
+
